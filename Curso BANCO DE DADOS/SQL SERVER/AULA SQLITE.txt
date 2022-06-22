@@ -1,0 +1,237 @@
+AULAS BANCO DE DADOS - SQL LITE
+
+Como abrir?
+
+1. windows + R
+2. cmd
+3. cd desktop
+4. sqlite3 nomearquivo.sqlite
+
+---------------------------------------------------------------------
+
+COMANDOS
+
+CREATE TABLE nometabela --> criar tabela
+.SCHEMA  --> mostra como que eu defini a tabela
+.EXIT --> sai 
+.HEADERS ON --> liga o cabeçalho
+SELECT * FROM nometabela; --> consultando tudo da tabela
+INSERT INTO tabela(onde?) VALUES (o que?); --> inserindo na tabela os valores...
+DROP TABLE nometabela --> exclui uma tabela, indice..
+ALTER TABLE nometabela RENAME TO novonome --> alterar nome da tabela
+ALTER TABLE nometabela ADD oqvouadicionar tipodoqadicionei; --> adiciona a tabela um novo campo
+SELECT * FROM nometabela WHERE informaçãoparalimitar = dado --> filtrando a consulta com where
+SELECT nomecampo1, nomecampo2 FROM nometabela --> filtrando algumas colunas
+DELETE FROM nometabela WHERE condição; --> apagar ou remover campos em uma tabela
+LIKE 'caractere%'; --> colocar no meio das aspas o caractere que deve ser utilizado de filtro, o porcentagem quer dizer "qualquer"
+UPDATE tabela SET campo='nova_informação' WHERE filtro; --> atualizando informação
+SELECT COUNT(*) FROM nometabela; --> count conta quantos registros há
+SELECT AVG(coluna) FROM nometabela; --> no sqlite tras a média
+SELECT MAX(coluna) FROM nometabela; --> filtra o maior valor
+SELECT MIN(coluna) FROM nometabela; --> filtra o menor valor
+SELECT COUNT(*) FROM nometabela WHERE limitação GROUP BY coluna; --> group by vai agrupar pela coluna informada
+SELECT COUNT(*) FROM nometabela where limitação GROUP BY coluna HAVING COUNT(*) < 30; --> having impoe outra limitação, nesse caso mostra apenas os com contagem menor que 30
+SELECT DISTINCT campo FROM nometabela; --> o distinct não deixa que ocorra repetição (valores únicos)
+SELECT * FROM nometabela LIMIT numero; --> o limit limita o número de registros que aparece no select, ex: se eu colocar 10, aparecerá até no max 10 registros
+SELECT l.titulo FROM livro WHERE l.autor= (SELECT id FROM autor WHERE nome='Dan Brown'); --> subselect é um select dentro do outro
+
+---------------------------------------------------------------------
+ALGUMAS FUNÇÕES
+
+1. if null --> se for nulo... faça isso
+select titulo, ifnull(estilo_id, "Falta Código do estilo") from livro;
+
+2. length --> retorna o numero de caracteres
+select length(titulo) from livro where id=1;
+
+3. lower --> deixa o campo em minusculas
+select lower(titulo) from livro where id=1;
+
+4. upper --> deixa o campo em maiusculas
+select upper(titulo) from livro where id=1;
+
+5. substr(x,y,z) --> traz de x, iniciando em y o tanto de caractere que é combinado em z
+select substr("Curso de SQL",3,3); --> retorna rso
+
+6. random --> gera numero aleatório
+select random();
+select titulo, substr(random,3,3) as codigo_inventado from livro;
+
+7. the replace(x, y, z) --> troca por
+select titulo("Curso de SQL", " ", "---") --> TROCO O ESPAÇO POR ---
+
+8. round() --> arredonda
+select titulo, round(precovenda,1) from livro; --> 1 representa o numero de casas decimais
+
+9. trim() --> remove espaços do inicio e fim
+select trim("    Curso _  de _ S Q  L     ");
+
+10. rtrim() --> remove espaço do final
+select rtrim("    Curso _  de _ S Q  L     ");
+
+11. ltrim() --> remove espaço do inicio
+select ltrim("    Curso _  de _ S Q  L     ");
+
+12. typeof() --> retorna o tipo
+select typeof(1) --> retorna integer
+
+13. date('now') --> retorna a data atual
+select date('now');
+
+14. sqlite_version() --> retorna a versão do sqlite
+select sqlite_verison();
+
+---------------------------------------------------------------------
+CRIANDO UMA VIEW (abrevição/simplificação de select)
+
+CREATE VIEW SaoPaulo AS
+SELECT a.nome, e.nome, es.nome, l.titulo, e.estado 
+FROM livro l, autor a, editora e, estilo es 
+WHERE a.id = l.autor_id
+AND e.id = l.editora_id
+AND es.id = l.estilo_id
+AND e.estado='SP';  (este é apenas um exemplo, pode ser qualquer tipo de select)
+
+select * from SaoPaulo;
+
+EXCLUINDO UMA VIEW
+
+drop view nomeview;
+
+----------------------------------------------------------------------
+CRIANDO UMA INDEX (acelerar busca)
+
+create index nomeindex on nometabela(
+	nomecampo
+);
+
+ENCLUINDO UMA INDEX
+
+drop index nomeindex;
+----------------------------------------------------------------------
+
+TRIGGERS
+
+Triggers = gatilhos
+	- Podem ser disparados por: (EVENTOS) 
+		* Delete
+		* Insert
+		* Update
+	- Executar quando?
+		* After 		
+		* Before
+	- Como afetar os campos?
+		* OLD.campo
+		*NEW.campo
+	- Qual um uso comum?
+		* Tabelas de auditoria (segurança, rastreio de mudanças, anotar a data de todas mudanças)
+
+-- Criando a tabela de auditoria
+create table auditoria(autor_id int, data date, acao text);
+
+-- Vamos criar nossa trigger de auditoria
+CREATE TRIGGER auditoria AFTER INSERT ON autor
+BEGIN
+	INSERT INTO auditoria(autor_id, data, acao) values (new.id, datetime('now'),'Autor inserido');
+END;
+
+-- Inserindo para testar 
+insert into autor(id, nome) values (10, 'ANA');
+
+-- Conferindo na auditoria
+select * from auditoria
+
+-- Criando uma trigger para quando o cara for excluido
+CREATE TRIGGER auditoria2 AFTER DELETE ON autor
+BEGIN
+	INSERT INTO auditoria (autor_id, data, acao) values (old.id, datetime('nov'), 'Autor excluído');
+END;
+
+-- Testando
+Delete from autor where id=10;
+
+-- Conferindo na auditoria
+select * from auditoria
+
+-- Excluindo trigger:
+drop trigger auditoria;
+
+----------------------------------------------------------------------
+COMO FAZER UM JOIN?
+
+1) Escreva o select com o from de todas as tabelas que precisa
+2) adicione um apelido para cada tabela
+3) Faça as ligações
+4) Adicione outras restrições
+
+ex sem join:
+select l.titulo, a.nome from livro l, autor a where a.id = l.autor_id 
+
+-- Tradicional INNER JOIN
+select l.titulo, e.nome
+from livro l, estilo e
+where e.id = l.estilo_id;
+
+-- Outra forma de INNER JOIN (condição satisfeita de ambos os lados)
+select titulo, nome
+from estilo INNER JOIN livro
+on estilo.id = livro.estilo_id;
+
+-- OUTER JOIN (traz mesmo que seja null)
+select titulo, nome
+from estilo LEFT OUTER JOIN livro 
+on estilo.id = livro.estilo_id;
+
+select titulo, nome
+from livro LEFT OUTER JOIN estilo
+on estilo_id = livro.estilo_id;
+
+----------------------------------------------------------------------
+
+TIPOS DE DADOS
+
+text --> texto (entre aspas)
+integer --> números inteiros
+number --> permite casas decimais
+date --> datas
+char
+varchar
+nvarchar
+boolean 
+
+---------------------------------------------------------------------
+
+OPERADORES
+
+>
+<
+>=
+<=
+or
+and
+in ()
+
+--------------------------------------------------------------------
+
+ORDENAÇÃO
+
+order by camporeferencia --> ordena de acordo com o campo colocado
+order by camporeferencia desc --> ordena em ordem decrescente
+
+--------------------------------------------------------------------
+
+REGRAS USUAIS DE FORMATAÇÃO:
+
+nomes no singular
+Chave primária: campo existente na tabela que torna o registro único. Normalmente o primeiro campo, o código. Se chamará id
+Chave estrangeira: campo que existe na minha tabela que se liga a chave primária de outra tabela. Representar com tabela_id
+
+
+Regra Constraint --> não deixa que outro código igual seja criado
+
+
+
+obs: transações
+begin transaction;
+....
+commit (para concluir) ou rollback (cancelar)

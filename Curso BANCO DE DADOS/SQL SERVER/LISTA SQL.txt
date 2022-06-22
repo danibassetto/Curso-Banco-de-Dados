@@ -1,0 +1,42 @@
+ATIVIDADE BANCO
+
+1.
+select c.cdibge, nomemunicipio, count(c.cdibge) as clientes from cliente c join municipio m on c.cdibge = m.cdibge group by c.cdibge, m.nomemunicipio
+
+2.
+select e.uf, e.nomeuf, count(e.cod) as clientes from estado e join cliente c on substring(c.cdibge, 1, 2) = e.cod group by e.uf, e.nomeuf
+
+3.
+select p.idcliente, c.nome, m.nomemunicipio, (sum(p.total) / count(c.cdibge)) from cliente c
+join pedido p on c.id = p.idcliente
+join municipio m on c.cdibge = m.cdibge
+group by p.idcliente, c.nome, m.nomemunicipio
+
+4. 
+select * from pedido where dataregistro like '2021-11%'
+select max(total) from pedido where dataregistro like '2021-11%'
+
+5. 
+select datepart(month, dataregistro) as "Número do Mês", datename(MONTH, dataregistro) as "Nome Mês", SUM(total - impostos) as "Total Recebido"  from pedido GROUP BY datepart(month, dataregistro), datename(MONTH, dataregistro)
+
+6.
+select sum(descontos) as "Total de Desconto em Outubro" from pedido where dataregistro between '2021-10-01' and '2021-10-30'
+
+7.
+select CONCAT('',DATEPART(DAY, dataregistro),'/',DATEPART(MONTH, dataregistro),'') AS data, count(DATEPART(DAY, dataregistro)) AS quantidade, SUM(total + impostos - descontos) as totaliquido from pedido group by DATEPART(DAY, dataregistro), DATEPART(MONTH, dataregistro)
+
+8.
+select DATENAME(MONTH, dataregistro) AS "Nome do mês", count(DATEPART(MONTH, dataregistro)) AS "Vendas" from pedido group by DATENAME(MONTH, dataregistro), DATEPART(MONTH, dataregistro)
+
+9.
+SELECT e.uf, e.nomeuf, datename(month, dataregistro) as "Nome mês", SUM(total + impostos - descontos) as "Valor Líquido" FROM cliente c
+JOIN pedido p on p.idcliente = c.id
+JOIN estado e on substring(c.cdibge, 1, 2) = e.cod
+group by DATEPART(MONTH, dataregistro), e.uf, e.nomeuf, DATEPART(MONTH, dataregistro), DATENAME(MONTH, dataregistro) order by e.uf, datepart(month, dataregistro) DESC;
+
+
+
+
+
+
+

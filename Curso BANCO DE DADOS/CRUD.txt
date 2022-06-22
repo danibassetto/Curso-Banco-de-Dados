@@ -1,0 +1,27 @@
+Create, Read, Update, e Delete
+
+
+Criar
+CREATE TABLE dbo.nometabela (id int, name text);
+
+INSERT INTO <tablename> (column1,column2,….) VALUES (value1,value2,….)
+
+
+Ler
+SELECT * FROM <TableName>
+
+Atualização
+
+UPDATE <TableName> SET Column1=Value1, Column2=Value2,… WHERE <Expression>
+
+
+Excluir
+DELETE FROM <TableName> WHERE <Expression>
+
+
+Adicionar campo booleano
+alter table agenda add teste bit not null default 0
+
+Alterar tipo de dado
+alter table agenda alter column nomecoluna nvarchar()
+                                           colocar novo tipo

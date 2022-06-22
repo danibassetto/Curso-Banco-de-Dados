@@ -1,0 +1,29 @@
+AULAS BANCO DE DADOS - SQL LITE
+
+Como abrir?
+1. windows + R
+2. cmd
+3. cd desktop
+4. sqlite3 nomearquivo.sqlite
+
+comandos
+create table --> criar tabela
+.schema  --> mostra como que eu defini a tabela
+.exit --> sai 
+.headers on --> liga o cabeçalho
+insert 
+select * from nometabela; --> consultando tudo da tabela
+insert into tabela(onde?) values (o que?); --> inserindo na tabela os valores...
+drop table tabela --> exclui uma tabela, indice..
+alter table nometabela rename to novonome --> alterar nome da tabela
+alter table nometabela add oqvouadicionar tipodoqadicionei; --> adiciona a tabela um novo campo
+
+tipos de dados 
+text --> texto (entre aspas)
+integer --> números inteiros
+number --> permite casas decimais
+date --> datas
+boolean 
+
+Chave primária: campo existente na tabela que torna o registro único. Normalmente o primeiro campo, o código.
+Regra Constraint --> não deixa que outro código igual seja criado
